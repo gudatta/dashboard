@@ -108,18 +108,15 @@ export class ItemDashboard {
     // Renders the navigation
     private renderNavigation(el: HTMLElement) {
         // Render the navigation
-        new Navigation(el, this._item, () => {
-            // Refresh the item
-            DataSource.refresh(this._item.Id).then((item: IListItem) => {
-                // Update the item
-                this._item = item;
+        new Navigation(el, this._item, (item: IListItem) => {
+            // Update the item
+            this._item = item;
 
-                // Refresh the dashboard
-                this.render();
+            // Refresh the dashboard
+            this.render();
 
-                // Call the event
-                this._onUpdate();
-            });
+            // Call the event
+            this._onUpdate();
         });
     }
 

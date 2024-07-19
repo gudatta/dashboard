@@ -3,6 +3,7 @@ import { Components } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import { ItemDashboard } from "./dashboard";
 import { DataSource, IListItem } from "./ds";
+import { Forms } from "./forms";
 import { InstallationModal } from "./install";
 import Strings from "./strings";
 import { Security } from "./security";
@@ -20,12 +21,9 @@ export class App {
     }
 
     // Refreshes the dashboard
-    private refresh(itemId: number) {
-        // Refresh the data
-        DataSource.refresh(itemId).then(() => {
-            // Refresh the table
-            this._dashboard.refresh(DataSource.ListItems);
-        });
+    private refresh() {
+        // Refresh the table
+        this._dashboard.refresh(DataSource.ListItems);
     }
 
     // Renders the dashboard
@@ -54,12 +52,9 @@ export class App {
                         isButton: true,
                         onClick: () => {
                             // Show the new form
-                            DataSource.List.newForm({
-                                useModal: false,
-                                onUpdate: (item: IListItem) => {
-                                    // Refresh the dashboard
-                                    this.refresh(item.Id);
-                                }
+                            Forms.New(() => {
+                                // Refresh the dashboard
+                                this.refresh();
                             });
                         }
                     }
@@ -167,13 +162,9 @@ export class App {
                                             type: Components.ButtonTypes.OutlinePrimary,
                                             onClick: () => {
                                                 // Show the edit form
-                                                DataSource.List.editForm({
-                                                    itemId: item.Id,
-                                                    useModal: false,
-                                                    onUpdate: () => {
-                                                        // Refresh the dashboard
-                                                        this.refresh(item.Id);
-                                                    }
+                                                Forms.Edit(item.Id, () => {
+                                                    // Refresh the dashboard
+                                                    this.refresh();
                                                 });
                                             }
                                         }
@@ -187,7 +178,7 @@ export class App {
                                                 // Show the item dashboard
                                                 new ItemDashboard(item, () => {
                                                     // Refresh the dashboard
-                                                    this.refresh(item.Id);
+                                                    this.refresh();
                                                 });
                                             }
                                         }

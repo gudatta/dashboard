@@ -8,10 +8,10 @@ import { DataSource, IListItem } from "../ds";
 export class Navigation {
     private _el: HTMLElement = null;
     private _item: IListItem = null;
-    private _onUpdate: () => void = null;
+    private _onUpdate: (item: IListItem) => void = null;
 
     // Constructor
-    constructor(el: HTMLElement, item: IListItem, onUpdate: () => void) {
+    constructor(el: HTMLElement, item: IListItem, onUpdate: (item: IListItem) => void) {
         this._el = el;
         this._item = item;
         this._onUpdate = onUpdate;
@@ -37,11 +37,21 @@ export class Navigation {
                 this._item.update({
                     Status: DataSource.StatusFilters[i + 1].label
                 }).execute(() => {
-                    // Call the event
-                    this._onUpdate();
+                    // Update the loading dialog
+                    LoadingDialog.setHeader("Refreshing Item");
+                    LoadingDialog.setBody("This will close after the item is refreshed...");
 
-                    // Hide the loading dialog
-                    LoadingDialog.hide();
+                    // Refresh the data source
+                    DataSource.refresh(this._item.Id).then((item: IListItem) => {
+                        // Set the item
+                        this._item = item;
+
+                        // Call the event
+                        this._onUpdate(item);
+
+                        // Hide the loading dialog
+                        LoadingDialog.hide();
+                    });
                 })
             }
         }
@@ -64,11 +74,21 @@ export class Navigation {
                 this._item.update({
                     Status: DataSource.StatusFilters[i - 1].label
                 }).execute(() => {
-                    // Call the event
-                    this._onUpdate();
+                    // Update the loading dialog
+                    LoadingDialog.setHeader("Refreshing Item");
+                    LoadingDialog.setBody("This will close after the item is refreshed...");
 
-                    // Hide the loading dialog
-                    LoadingDialog.hide();
+                    // Refresh the data source
+                    DataSource.refresh(this._item.Id).then((item: IListItem) => {
+                        // Set the item
+                        this._item = item;
+
+                        // Call the event
+                        this._onUpdate(item);
+
+                        // Hide the loading dialog
+                        LoadingDialog.hide();
+                    });
                 })
             }
         }
@@ -117,8 +137,22 @@ export class Navigation {
                         itemId: this._item.Id,
                         useModal: false,
                         onUpdate: () => {
-                            // Call the update event
-                            this._onUpdate();
+                            // Show a loading dialog
+                            LoadingDialog.setHeader("Refreshing Item");
+                            LoadingDialog.setBody("This will close after the item is refreshed...");
+                            LoadingDialog.show();
+
+                            // Refresh the data source
+                            DataSource.refresh(this._item.Id).then((item: IListItem) => {
+                                // Set the item
+                                this._item = item;
+
+                                // Call the event
+                                this._onUpdate(item);
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            });
                         }
                     });
                 }
