@@ -2,7 +2,9 @@ import { Dashboard } from "dattatable";
 import { Components } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import { DataSource, IListItem } from "./ds";
+import { InstallationModal } from "./install";
 import Strings from "./strings";
+import { Security } from "./security";
 
 /**
  * Main Application
@@ -41,6 +43,7 @@ export class App {
                         onClick: () => {
                             // Show the new form
                             DataSource.List.newForm({
+                                useModal: false,
                                 onUpdate: (item: IListItem) => {
                                     // Refresh the data
                                     DataSource.refresh(item.Id).then(() => {
@@ -51,7 +54,18 @@ export class App {
                             });
                         }
                     }
-                ]
+                ],
+                itemsEnd: Security.IsAdmin ? [
+                    {
+                        className: "btn-outline-light me-2",
+                        text: "Settings",
+                        isButton: true,
+                        onClick: () => {
+                            // Show the install dialog
+                            InstallationModal.show(true);
+                        }
+                    }
+                ] : null
             },
             footer: {
                 itemsEnd: [
@@ -131,7 +145,8 @@ export class App {
                                             onClick: () => {
                                                 // Show the display form
                                                 DataSource.List.viewForm({
-                                                    itemId: item.Id
+                                                    itemId: item.Id,
+                                                    useModal: false
                                                 });
                                             }
                                         }
@@ -145,6 +160,7 @@ export class App {
                                                 // Show the edit form
                                                 DataSource.List.editForm({
                                                     itemId: item.Id,
+                                                    useModal: false,
                                                     onUpdate: () => {
                                                         // Refresh the data
                                                         DataSource.refresh(item.Id).then(() => {
@@ -153,6 +169,16 @@ export class App {
                                                         });
                                                     }
                                                 });
+                                            }
+                                        }
+                                    },
+                                    {
+                                        content: "Click to view the dashboard for this item.",
+                                        btnProps: {
+                                            text: "Details",
+                                            type: Components.ButtonTypes.OutlinePrimary,
+                                            onClick: () => {
+                                                // TODO
                                             }
                                         }
                                     }
