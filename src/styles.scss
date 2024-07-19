@@ -1,1 +1,11 @@
-/** Custom styles go here */
+/** Canvas Form */
+#core-canvas .offcanvas {
+    z-index: 2000;
+}
+
+/** Status Bar Line */
+.line {
+    width: 120px;
+    height: 6px;
+    background: var(--sp-theme-primary, #0078d4);
+}

@@ -1,6 +1,7 @@
 import { Dashboard } from "dattatable";
 import { Components } from "gd-sprest-bs";
 import * as jQuery from "jquery";
+import { ItemDashboard } from "./dashboard";
 import { DataSource, IListItem } from "./ds";
 import { InstallationModal } from "./install";
 import Strings from "./strings";
@@ -10,16 +11,27 @@ import { Security } from "./security";
  * Main Application
  */
 export class App {
+    private _dashboard: Dashboard = null;
+
     // Constructor
     constructor(el: HTMLElement) {
         // Render the dashboard
         this.render(el);
     }
 
+    // Refreshes the dashboard
+    private refresh(itemId: number) {
+        // Refresh the data
+        DataSource.refresh(itemId).then(() => {
+            // Refresh the table
+            this._dashboard.refresh(DataSource.ListItems);
+        });
+    }
+
     // Renders the dashboard
     private render(el: HTMLElement) {
         // Create the dashboard
-        let dashboard = new Dashboard({
+        this._dashboard = new Dashboard({
             el,
             hideHeader: true,
             useModal: true,
@@ -29,7 +41,7 @@ export class App {
                     items: DataSource.StatusFilters,
                     onFilter: (value: string) => {
                         // Filter the table
-                        dashboard.filter(2, value);
+                        this._dashboard.filter(2, value);
                     }
                 }]
             },
@@ -45,11 +57,8 @@ export class App {
                             DataSource.List.newForm({
                                 useModal: false,
                                 onUpdate: (item: IListItem) => {
-                                    // Refresh the data
-                                    DataSource.refresh(item.Id).then(() => {
-                                        // Refresh the table
-                                        dashboard.refresh(DataSource.ListItems);
-                                    });
+                                    // Refresh the dashboard
+                                    this.refresh(item.Id);
                                 }
                             });
                         }
@@ -162,11 +171,8 @@ export class App {
                                                     itemId: item.Id,
                                                     useModal: false,
                                                     onUpdate: () => {
-                                                        // Refresh the data
-                                                        DataSource.refresh(item.Id).then(() => {
-                                                            // Refresh the table
-                                                            dashboard.refresh(DataSource.ListItems);
-                                                        });
+                                                        // Refresh the dashboard
+                                                        this.refresh(item.Id);
                                                     }
                                                 });
                                             }
@@ -178,7 +184,11 @@ export class App {
                                             text: "Details",
                                             type: Components.ButtonTypes.OutlinePrimary,
                                             onClick: () => {
-                                                // TODO
+                                                // Show the item dashboard
+                                                new ItemDashboard(item, () => {
+                                                    // Refresh the dashboard
+                                                    this.refresh(item.Id);
+                                                });
                                             }
                                         }
                                     }
